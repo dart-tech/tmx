@@ -1,0 +1,13 @@
+{
+  "index": "Introduction",
+  "getting-started": "Getting Started",
+  "concepts": "Concepts",
+  "packages": "Packages",
+  "workflows": "Workflows",
+  "examples": "Examples",
+  "backend": "Supported Backend's",
+  "about": {
+    "title": "About",
+    "type": "page"
+  }
+}
