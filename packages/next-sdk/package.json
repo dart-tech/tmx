@@ -1,24 +1,36 @@
 {
   "name": "@tmx/next-sdk",
   "version": "0.0.0",
+  "type": "module",
   "private": true,
   "exports": {
-    "./button": "./src/button.tsx"
+    "./button": "./src/button.tsx",
+    "./EntityForm": {
+      "types": "./dist/EntityForm.d.ts",
+      "default": "./dist/EntityForm.js"
+    }
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
-    "generate:component": "turbo gen react-component"
+    "generate:component": "turbo gen react-component",
+    "build": "rollup --config",
+    "dev": "pnpm run build --watch"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.5",
     "@tmx/eslint-config": "workspace:*",
     "@tmx/typescript-config": "workspace:*",
     "@turbo/gen": "^1.10.12",
-    "@types/node": "^20.5.2",
     "@types/eslint": "^8.44.7",
+    "@types/node": "^20.5.2",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "eslint": "^8.53.0",
     "react": "^18.2.0",
+    "rollup": "^4.9.2",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "dist": "link:/Users/ismajl/Documents/oss/tmx/packages/next-sdk/dist"
   }
 }
