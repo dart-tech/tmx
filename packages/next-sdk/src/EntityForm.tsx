@@ -2,11 +2,12 @@
 
 interface EntityFormProps {
   entity: string;
+  dataTestId?: string;
 }
 
-export const EntityForm = ({ entity }: EntityFormProps) => {
+export const EntityForm = ({ entity, dataTestId }: EntityFormProps) => {
   return (
-    <div>
+    <div data-testid={dataTestId}>
       Entity Form Component
       {` `}
       {entity}

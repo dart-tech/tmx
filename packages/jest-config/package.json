@@ -1,0 +1,19 @@
+{
+  "name": "@tmx/jest-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "index.js"
+  ],
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.6",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@tmx/eslint-config": "workspace:*",
+    "@types/jest": "^29.5.11",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "rollup-jest": "^3.1.0",
+    "ts-jest": "^29.1.1"
+  }
+}
