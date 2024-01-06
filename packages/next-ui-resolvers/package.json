@@ -1,0 +1,36 @@
+{
+  "name": "@tmx/next-ui-resolvers",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./button": "./src/button.tsx"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "generate:component": "turbo gen react-component",
+    "build": "rollup --config",
+    "dev": "pnpm run build --watch",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@testing-library/jest-dom": "^6.1.6",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@tmx/eslint-config": "workspace:*",
+    "@tmx/typescript-config": "workspace:*",
+    "@turbo/gen": "^1.10.12",
+    "@types/eslint": "^8.44.7",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.5.2",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "eslint": "^8.53.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "react": "^18.2.0",
+    "rollup": "^4.9.2",
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@tmx/typescript-config/react-library.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
+  "exclude": ["node_modules", "dist"]
+}

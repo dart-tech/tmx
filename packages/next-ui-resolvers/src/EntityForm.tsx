@@ -1,4 +1,5 @@
 "use client";
+
 interface EntityFormProps {
   id: string;
   dataTestId?: string;
@@ -7,6 +8,7 @@ interface EntityFormProps {
 export const EntityForm = ({ id, dataTestId }: EntityFormProps) => {
   return (
     <div data-testid={dataTestId}>
+      Entity Form Component
       {` `}
       {id}
     </div>
