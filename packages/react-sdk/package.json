@@ -1,5 +1,5 @@
 {
-  "name": "@tmx/next-sdk",
+  "name": "@tmx/react-sdk",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -8,6 +8,10 @@
     "./EntityForm": {
       "types": "./dist/EntityForm.d.ts",
       "default": "./dist/EntityForm.js"
+    },
+    "./AppContext": {
+      "types": "./dist/AppContext.d.ts",
+      "default": "./dist/AppContext.js"
     }
   },
   "scripts": {

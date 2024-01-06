@@ -1,6 +1,6 @@
 import { Entity } from "./Entity";
 
-export interface AppConfig {
+export interface App {
   id: string;
   name: string;
   entities: Entity[];

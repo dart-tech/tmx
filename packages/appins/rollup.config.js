@@ -2,9 +2,9 @@ import typescript from "@rollup/plugin-typescript";
 
 const entries = [
   {
-    input: "src/AppContext/index.tsx",
+    input: "src/AppProvider/index.tsx",
     output: {
-      file: "dist/AppContext.js",
+      file: "dist/AppProvider.js",
     },
   },
 ];

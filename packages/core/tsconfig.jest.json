@@ -1,4 +1,0 @@
-{
-  "extends": "@tmx/typescript-config/react-library.json",
-  "exclude": ["node_modules", "dist"]
-}

@@ -13,6 +13,12 @@ const entries = [
       file: "dist/EntityForm.js",
     },
   },
+  {
+    input: "src/AppContext.ts",
+    output: {
+      file: "dist/AppContext.js",
+    },
+  },
 ];
 
 export default entries.map((entry) => ({ ...entry, plugins: [typescript()] }));

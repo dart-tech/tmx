@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./AppContext": {
-      "types": "./dist/AppContext.d.ts",
-      "default": "./dist/AppContext.js"
+    "./AppProvider": {
+      "types": "./dist/AppProvider.d.ts",
+      "default": "./dist/AppProvider.js"
     }
   },
   "scripts": {
@@ -15,9 +15,6 @@
     "build": "rollup --config",
     "dev": "pnpm run build --watch",
     "test": "jest"
-  },
-  "dependencies": {
-    "@tmx/core": "workspace:*"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.5",
@@ -38,5 +35,8 @@
     "react": "^18.2.0",
     "rollup": "^4.9.2",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@tmx/react-sdk": "workspace:^"
   }
 }
