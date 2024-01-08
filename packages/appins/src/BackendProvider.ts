@@ -125,4 +125,25 @@ export class AppinsBackendProvider extends BackendProvider {
     });
     return records;
   }
+  async createRecord(
+    entity: Entity,
+    record: DataRecord
+  ): Promise<[DataRecord | undefined, string | undefined]> {
+    const token = await this.getJWTToken();
+    const response = await fetch(
+      `${this.apiEndpoint}/lambda-server/4thwave-cms/${entity.id}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: token || "",
+        },
+        body: JSON.stringify(record || {}),
+      }
+    ).then((res) => res.json());
+    const receivedRecord = response.record;
+    receivedRecord.id = receivedRecord.id.toString();
+    return [receivedRecord, undefined];
+  }
 }

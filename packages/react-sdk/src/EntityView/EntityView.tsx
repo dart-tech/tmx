@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAppState } from "../AppContext.js";
+import { DataRecord, useAppState } from "../AppContext.js";
 import { EntityForm } from "../index.js";
 import { RecordFormatter } from "../Formatter/RecordFormatter.js";
+import { PlusIcon } from "../Icons/PlusIcon.js";
 
 interface EntityViewProps {
   id: string;
@@ -9,8 +10,14 @@ interface EntityViewProps {
 }
 
 export function EntityView(props: EntityViewProps) {
-  const { Resolvers, backendProvider, app, setDataBlock, getDataBlock } =
-    useAppState();
+  const {
+    Resolvers,
+    backendProvider,
+    app,
+    setDataBlock,
+    setDataBlockRecord,
+    getDataBlock,
+  } = useAppState();
   const entityId = props.id;
   const entity = app?.entities[entityId];
   const [activeRecord, setActiveRecord] = useState<string | null>(null);
@@ -42,14 +49,6 @@ export function EntityView(props: EntityViewProps) {
         maxWidth: "95%",
       }}
     >
-      <div className="flex gap-3 p-3 z-10 w-full justify-start items-center shrink-0 overflow-inherit color-inherit subpixel-antialiased rounded-t-large flex gap-3">
-        <div className="flex flex-col">
-          <h1 className="text-md">{entity.name}</h1>
-          <p className="text-small text-default-500">{entity?.description}</p>
-        </div>
-      </div>
-      <Resolvers.Divider />
-
       {busy ? (
         <div
           style={{
@@ -78,13 +77,57 @@ export function EntityView(props: EntityViewProps) {
               flex: 1,
             }}
           >
+            <div
+              className="flex gap-3 p-3 z-10 w-full justify-start items-center shrink-0 overflow-inherit color-inherit subpixel-antialiased rounded-t-large flex gap-3 mb-3"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                height: "3rem",
+              }}
+            >
+              <div className="flex flex-col">
+                <h1 className="text-md">{entity.name}</h1>
+                <p className="text-small text-default-500">
+                  {entity?.description}
+                </p>
+              </div>
+              <span
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "2rem",
+                  width: "2rem",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                }}
+                className="bg-default-100"
+                onClick={async () => {
+                  const [record] = await backendProvider.createRecord(
+                    entity,
+                    {} as DataRecord
+                  );
+                  if (record) {
+                    setDataBlockRecord(entityId, record);
+                    setActiveRecord(record.id);
+                  }
+                }}
+              >
+                <PlusIcon />
+              </span>
+            </div>
             {records.length ? (
               <Resolvers.Listbox
                 aria-label="Actions"
                 style={{
-                  paddingRight: 0,
-                  marginTop: "0.8rem",
+                  paddingRight: 10,
+                  marginTop: "1rem",
+                  overflowY: "auto",
+                  maxHeight: "calc(100vh - 10rem)",
                 }}
+                className="border-r border-divider"
                 selectionMode="single"
                 selectedKeys={[`key-${activeRecord}` || ""]}
                 defaultSelectedKeys={[`key-${activeRecord}` || ""]}

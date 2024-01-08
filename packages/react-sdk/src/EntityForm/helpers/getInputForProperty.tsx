@@ -16,6 +16,12 @@ export const getInputForProperty = (
       return resolvers.SingleSelectProperty;
     case PROPERTY_TYPE.URL:
       return resolvers.UrlProperty;
+    case PROPERTY_TYPE.SWITCH:
+      return resolvers.SwitchProperty;
+    case PROPERTY_TYPE.RICH_TEXT:
+      return resolvers.RichTextProperty;
+    case PROPERTY_TYPE.FILES:
+      return resolvers.FilesProperty;
     default:
       return Default;
   }

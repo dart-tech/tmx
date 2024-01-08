@@ -289,6 +289,10 @@ abstract class BackendProvider {
     entity: Entity,
     record: DataRecord
   ): Promise<[DataRecord | undefined, string | undefined]>;
+  abstract createRecord(
+    entity: Entity,
+    record: DataRecord
+  ): Promise<[DataRecord | undefined, string | undefined]>;
 }
 
 export {

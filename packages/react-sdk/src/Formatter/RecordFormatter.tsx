@@ -15,7 +15,11 @@ export function RecordFormatter(props: RecordFormatterProps) {
     const option = options?.find((option) => option.id === value);
     return <>{option?.name}</>;
   }
-  return <>{truncateString(value, 30)}</>;
+  if (value) {
+    return <>{truncateString(value, 30)}</>;
+  } else {
+    return <>Untitiled...</>;
+  }
 }
 
 export function truncateString(str: string, length: number) {
