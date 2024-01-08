@@ -3,17 +3,6 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
-  "exports": {
-    "./button": "./src/button.tsx",
-    "./EntityForm": {
-      "types": "./dist/EntityForm.d.ts",
-      "default": "./dist/EntityForm.js"
-    },
-    "./AppContext": {
-      "types": "./dist/AppContext.d.ts",
-      "default": "./dist/AppContext.js"
-    }
-  },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "generate:component": "turbo gen react-component",
@@ -21,6 +10,7 @@
     "dev": "pnpm run build --watch",
     "test": "jest"
   },
+  "main": "dist/index.js",
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.5",
     "@testing-library/jest-dom": "^6.1.6",
@@ -40,5 +30,10 @@
     "react": "^18.2.0",
     "rollup": "^4.9.2",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "deep-diff": "^1.0.2",
+    "immer": "^10.0.3",
+    "react-hook-form": "^7.49.2"
   }
 }

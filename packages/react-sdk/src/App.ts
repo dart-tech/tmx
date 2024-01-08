@@ -3,5 +3,6 @@ import { Entity } from "./Entity";
 export interface App {
   id: string;
   name: string;
-  entities: Entity[];
+  description?: string;
+  entities: Record<string, Entity>;
 }

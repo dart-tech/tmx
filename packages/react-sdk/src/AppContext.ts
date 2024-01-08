@@ -1,40 +1,100 @@
 import { createContext, ReactNode, useContext } from "react";
-import { App } from "./App";
+import { App } from "./App.js";
+import { Entity } from "./Entity.js";
+import { produce } from "immer";
 
 enum APP_CURRENT_STATE {
   IDLE,
-  LOADING,
+  INITIALIZING,
   READY,
   ERROR,
+  SIGN_IN_REQUIRED,
 }
+
+type ResolversType = Record<string, any>;
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  grants?: RoleGrant[];
+}
+
+type RoleGrant = {
+  action: string;
+  subject: string;
+  conditions?: any;
+};
 
 interface AppState {
   app: App | undefined;
   currentState: APP_CURRENT_STATE;
   error: string | undefined;
+  auth:
+    | {
+        isAuthenticated: boolean;
+        isInitialized: boolean;
+        user: User | null;
+        busyInitializing: boolean;
+        errorInitializing: string | null;
+      }
+    | undefined;
+  dataBlock: Record<string, DataRecord[]>;
 }
 
 interface AppStateContextValue extends AppState {
-  setApp: (app: App) => void;
+  backendProvider: BackendProvider;
+  Resolvers: ResolversType;
+  setAuth: (auth: AppState["auth"]) => void;
+  setAppCurrentState: (currentState: APP_CURRENT_STATE) => void;
+  setDataBlockRecord: (dataBlockId: string, record: DataRecord) => void;
+  setDataBlock: (dataBlockId: string, data: DataRecord[]) => void;
+  getDataBlock: (dataBlockId: string) => DataRecord[];
+  getDataBlockRecord: (dataBlockId: string, recordId: string) => DataRecord;
 }
 
 interface AppStateProviderProps {
   children: ReactNode;
+  backendProvider: BackendProvider;
+  Resolvers: ResolversType;
 }
 
 const defaultStateValue: AppState = {
   app: undefined,
+  auth: {
+    isAuthenticated: false,
+    isInitialized: false,
+    user: null,
+    busyInitializing: true,
+    errorInitializing: null,
+  },
   currentState: APP_CURRENT_STATE.IDLE,
   error: undefined,
+  dataBlock: {},
 };
 
 const defaultContextValue: AppStateContextValue = {
   ...defaultStateValue,
-  setApp: (app: App) => {},
+  setAuth: (auth: AppState["auth"]) => {},
+  setAppCurrentState: (currentState: APP_CURRENT_STATE) => {},
+  backendProvider: {} as BackendProvider,
+  Resolvers: {},
+  setDataBlockRecord: (dataBlockId: string, record: DataRecord) => {},
+  setDataBlock: (dataBlockId: string, data: DataRecord[]) => {},
+  getDataBlockRecord: (dataBlockId: string, recordId: string) => {
+    return {} as DataRecord;
+  },
+  getDataBlock: (dataBlockId: string) => {
+    return [] as DataRecord[];
+  },
 };
 
 enum ActionType {
   SET_APP = "SET_APP",
+  SET_APP_CURRENT_STATE = "SET_APP_CURRENT_STATE",
+  SET_AUTH = "SET_AUTH",
+  SET_DATA_BLOCK = "SET_DATA_BLOCK",
+  SET_DATA_BLOCK_RECORD = "SET_DATA_BLOCK_RECORD",
 }
 
 type SetApp = {
@@ -44,7 +104,42 @@ type SetApp = {
   };
 };
 
-type Action = SetApp;
+type SetAppCurrentState = {
+  type: ActionType.SET_APP_CURRENT_STATE;
+  payload: {
+    currentState: APP_CURRENT_STATE;
+  };
+};
+
+type SetAuth = {
+  type: ActionType.SET_AUTH;
+  payload: {
+    auth: AppState["auth"];
+  };
+};
+
+type SetDataBlock = {
+  type: ActionType.SET_DATA_BLOCK;
+  payload: {
+    dataBlockId: string;
+    data: DataRecord[];
+  };
+};
+
+type SetDataBlockRecord = {
+  type: ActionType.SET_DATA_BLOCK_RECORD;
+  payload: {
+    dataBlockId: string;
+    record: DataRecord;
+  };
+};
+
+type Action =
+  | SetApp
+  | SetAppCurrentState
+  | SetAuth
+  | SetDataBlock
+  | SetDataBlockRecord;
 
 type Handler = (state: AppState, action: Action) => AppState;
 
@@ -54,6 +149,49 @@ const handlers: Record<ActionType, Handler> = {
       ...state,
       app: action.payload.app,
     };
+  },
+  [ActionType.SET_APP_CURRENT_STATE]: (state, action) => {
+    return {
+      ...state,
+      currentState: action.payload.currentState,
+    };
+  },
+  [ActionType.SET_AUTH]: (state, action) => {
+    return {
+      ...state,
+      auth: action.payload.auth,
+    };
+  },
+  [ActionType.SET_DATA_BLOCK]: (state, action) => {
+    return {
+      ...state,
+      dataBlock: {
+        ...state.dataBlock,
+        [action.payload.dataBlockId]: action.payload.data,
+      },
+    };
+  },
+  [ActionType.SET_DATA_BLOCK_RECORD]: (state, action) => {
+    const nextState = produce(state, (draftState) => {
+      if (!draftState.dataBlock[action.payload.dataBlockId]) {
+        draftState.dataBlock[action.payload.dataBlockId] = [];
+      }
+
+      const recordIndex = draftState.dataBlock[
+        action.payload.dataBlockId
+      ].findIndex((record) => record.id === action.payload.record.id);
+      if (recordIndex === -1) {
+        draftState.dataBlock[action.payload.dataBlockId].push(
+          action.payload.record
+        );
+      } else {
+        draftState.dataBlock[action.payload.dataBlockId][recordIndex] = {
+          ...draftState.dataBlock[action.payload.dataBlockId][recordIndex],
+          ...action.payload.record,
+        };
+      }
+    });
+    return nextState;
   },
 };
 
@@ -74,6 +212,40 @@ const Actions = (dispatch: React.Dispatch<Action>) => ({
       },
     });
   },
+  setAppCurrentState: (currentState: APP_CURRENT_STATE) => {
+    dispatch({
+      type: ActionType.SET_APP_CURRENT_STATE,
+      payload: {
+        currentState,
+      },
+    });
+  },
+  setAuth: (auth: AppState["auth"]) => {
+    dispatch({
+      type: ActionType.SET_AUTH,
+      payload: {
+        auth,
+      },
+    });
+  },
+  setDataBlock: (dataBlockId: string, data: DataRecord[]) => {
+    dispatch({
+      type: ActionType.SET_DATA_BLOCK,
+      payload: {
+        dataBlockId,
+        data,
+      },
+    });
+  },
+  setDataBlockRecord: (dataBlockId: string, record: DataRecord) => {
+    dispatch({
+      type: ActionType.SET_DATA_BLOCK_RECORD,
+      payload: {
+        dataBlockId,
+        record,
+      },
+    });
+  },
 });
 
 const useAppState = () => {
@@ -86,6 +258,39 @@ const useAppState = () => {
   return context;
 };
 
+interface AppLoadError {
+  message: string;
+  state: APP_CURRENT_STATE;
+}
+
+interface DataRecord {
+  id: string;
+  [key: string]: any;
+}
+
+abstract class BackendProvider {
+  constructor(apiEndpoint: string) {
+    this.apiEndpoint = apiEndpoint;
+  }
+  apiEndpoint: string = "";
+  abstract loadApp(): Promise<[App | undefined, AppLoadError | undefined]>;
+  abstract signIn({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }): Promise<[User | undefined, string | undefined]>;
+  abstract getCurrentUser(): Promise<User | undefined>;
+  abstract getJWTToken(): Promise<string | undefined>;
+  abstract getSingleRecord(entity: Entity, id: string): Promise<DataRecord>;
+  abstract getRecords(entity: Entity): Promise<DataRecord[]>;
+  abstract saveRecord(
+    entity: Entity,
+    record: DataRecord
+  ): Promise<[DataRecord | undefined, string | undefined]>;
+}
+
 export {
   AppStateContext,
   ActionType,
@@ -95,6 +300,8 @@ export {
   defaultContextValue,
   Actions,
   useAppState,
+  BackendProvider,
+  APP_CURRENT_STATE,
 };
 
 export type {
@@ -103,4 +310,9 @@ export type {
   AppStateProviderProps,
   Action,
   SetApp,
+  App,
+  AppLoadError,
+  User,
+  ResolversType,
+  DataRecord,
 };
