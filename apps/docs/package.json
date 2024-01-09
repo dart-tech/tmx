@@ -17,8 +17,8 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.2",
-    "@tmx/eslint-config": "workspace:*",
-    "@tmx/typescript-config": "workspace:*",
+    "@tmakex/eslint-config": "workspace:*",
+    "@tmakex/typescript-config": "workspace:*",
     "@types/eslint": "^8.44.7",
     "@types/node": "^17.0.12",
     "@types/react": "^18.0.22",

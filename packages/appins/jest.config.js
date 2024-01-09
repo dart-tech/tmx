@@ -1,5 +1,5 @@
 // // Just importing the config from jsconfig workspace and exporting it
-import sharedConfig from "@tmx/jest-config/index.js";
+import sharedConfig from "@tmakex/jest-config/index.js";
 
 const config = {
   ...sharedConfig,

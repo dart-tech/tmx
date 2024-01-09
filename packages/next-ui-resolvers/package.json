@@ -1,5 +1,5 @@
 {
-  "name": "@tmx/next-ui-resolvers",
+  "name": "@tmakex/next-ui-resolvers",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -18,8 +18,8 @@
     "@testing-library/jest-dom": "^6.1.6",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.5.2",
-    "@tmx/eslint-config": "workspace:*",
-    "@tmx/typescript-config": "workspace:*",
+    "@tmakex/eslint-config": "workspace:*",
+    "@tmakex/typescript-config": "workspace:*",
     "@turbo/gen": "^1.10.12",
     "@types/eslint": "^8.44.7",
     "@types/jest": "^29.5.11",

@@ -269,10 +269,12 @@ interface DataRecord {
 }
 
 abstract class BackendProvider {
-  constructor(apiEndpoint: string) {
+  constructor(apiEndpoint: string, appId: string) {
     this.apiEndpoint = apiEndpoint;
+    this.appId = appId;
   }
   apiEndpoint: string = "";
+  appId: string = "";
   abstract loadApp(): Promise<[App | undefined, AppLoadError | undefined]>;
   abstract signIn({
     email,

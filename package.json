@@ -8,9 +8,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@tmx/eslint-config": "workspace:*",
-    "@tmx/typescript-config": "workspace:*",
-    "@tmx/jest-config": "workspace:*",
+    "@tmakex/eslint-config": "workspace:*",
+    "@tmakex/typescript-config": "workspace:*",
+    "@tmakex/jest-config": "workspace:*",
     "prettier": "^3.1.0",
     "turbo": "latest"
   },

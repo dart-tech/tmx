@@ -1,4 +1,4 @@
-import { App, Entity, Property, PropertyType } from "@tmx/react-sdk";
+import { App, Entity, Property, PropertyType } from "@tmakex/react-sdk";
 
 export interface Root {
   user: User;
@@ -122,30 +122,32 @@ export function mapApp(appConfig: Root): App {
     id: app.public_identifier,
     name: app.name,
     description: app.description,
-    entities: Object.keys(app.entities).reduce(
-      (accumulator: Record<string, Entity>, entityId: string) => {
-        const entity = app.entities[entityId];
-        if (!entity) {
-          return accumulator;
-        }
-        accumulator[entity.table_name] = {
-          id: entity.table_name,
-          name: entity.name,
-          description: entity.description,
-          config: {
-            hidden: entity.hidden,
+    entities: app.entities
+      ? Object.keys(app.entities).reduce(
+          (accumulator: Record<string, Entity>, entityId: string) => {
+            const entity = app.entities[entityId];
+            if (!entity) {
+              return accumulator;
+            }
+            accumulator[entity.table_name] = {
+              id: entity.table_name,
+              name: entity.name,
+              description: entity.description,
+              config: {
+                hidden: entity.hidden,
+              },
+              identity_property: entity.identity_property
+                ? mapProperty(entity.identity_property)
+                : undefined,
+              properties: entity.properties.map((property) =>
+                mapProperty(property)
+              ),
+            };
+            return accumulator;
           },
-          identity_property: entity.identity_property
-            ? mapProperty(entity.identity_property)
-            : undefined,
-          properties: entity.properties.map((property) =>
-            mapProperty(property)
-          ),
-        };
-        return accumulator;
-      },
-      {}
-    ),
+          {}
+        )
+      : {},
   };
 }
 

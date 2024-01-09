@@ -6,19 +6,19 @@ import {
   User,
   DataRecord,
   Entity,
-} from "@tmx/react-sdk";
+} from "@tmakex/react-sdk";
 import { getApiEndpoint } from "./getApiEndpoint.js";
 import { Auth } from "./amplifyConfig.js";
 import { mapApp } from "./mapApp.js";
 
 export class AppinsBackendProvider extends BackendProvider {
-  constructor() {
+  constructor(appId: string) {
     const APPINS_API_ENDPOINT = getApiEndpoint();
-    super(APPINS_API_ENDPOINT);
+    super(APPINS_API_ENDPOINT, appId);
   }
   async loadApp(): Promise<[App | undefined, AppLoadError | undefined]> {
     const token = await this.getJWTToken();
-    const result = await fetch(`${this.apiEndpoint}/app-config/4thwave-cms`, {
+    const result = await fetch(`${this.apiEndpoint}/app-config/${this.appId}`, {
       headers: {
         Authorization: token || "",
       },
@@ -78,7 +78,7 @@ export class AppinsBackendProvider extends BackendProvider {
   async getSingleRecord(entity: Entity, id: string): Promise<DataRecord> {
     const token = await this.getJWTToken();
     const response = await fetch(
-      `${this.apiEndpoint}/lambda-server/4thwave-cms/${entity.id}/${id}`,
+      `${this.apiEndpoint}/lambda-server/${this.appId}/${entity.id}/${id}`,
       {
         headers: {
           Authorization: token || "",
@@ -96,7 +96,7 @@ export class AppinsBackendProvider extends BackendProvider {
     const token = await this.getJWTToken();
     const { id, ...rest } = record;
     const result = await fetch(
-      `${this.apiEndpoint}/lambda-server/4thwave-cms/${entity.id}/${id}`,
+      `${this.apiEndpoint}/lambda-server/${this.appId}/${entity.id}/${id}`,
       {
         method: "PATCH",
         headers: {
@@ -112,7 +112,7 @@ export class AppinsBackendProvider extends BackendProvider {
   async getRecords(entity: Entity): Promise<DataRecord[]> {
     const token = await this.getJWTToken();
     const response = await fetch(
-      `${this.apiEndpoint}/lambda-server/4thwave-cms/${entity.id}?limit=100`,
+      `${this.apiEndpoint}/lambda-server/${this.appId}/${entity.id}?limit=100`,
       {
         headers: {
           Authorization: token || "",
@@ -131,7 +131,7 @@ export class AppinsBackendProvider extends BackendProvider {
   ): Promise<[DataRecord | undefined, string | undefined]> {
     const token = await this.getJWTToken();
     const response = await fetch(
-      `${this.apiEndpoint}/lambda-server/4thwave-cms/${entity.id}`,
+      `${this.apiEndpoint}/lambda-server/${this.appId}/${entity.id}`,
       {
         method: "POST",
         headers: {

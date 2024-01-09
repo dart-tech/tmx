@@ -1,5 +1,5 @@
 {
-  "extends": "@tmx/typescript-config/nextjs.json",
+  "extends": "@tmakex/typescript-config/nextjs.json",
   "compilerOptions": {
     "plugins": [
       {
