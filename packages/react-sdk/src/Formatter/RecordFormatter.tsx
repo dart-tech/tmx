@@ -18,7 +18,7 @@ export function RecordFormatter(props: RecordFormatterProps) {
   if (value) {
     return <>{truncateString(value, 30)}</>;
   } else {
-    return <>Untitiled...</>;
+    return <>Untitled...</>;
   }
 }
 

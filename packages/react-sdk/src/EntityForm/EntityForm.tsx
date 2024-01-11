@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { PROPERTY_TYPE, Property } from "../Property.js";
 import { buildPropsForProperty } from "./helpers/buildProps.js";
 import { getInputForProperty } from "./helpers/getInputForProperty.js";
-import { formValueDiff } from "./helpers/form-value-diff.js";
+import { formValueDiff } from "./helpers/formValueDiff.js";
 
 interface EntityFormProps {
   id: string;

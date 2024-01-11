@@ -60,6 +60,12 @@ export const AppProvider: FC<AppStateProviderProps> = (props) => {
     return state.dataBlock[dataBlockId] as DataRecord[];
   };
 
+  const handleSignOut = async () => {
+    actions.setAppCurrentState(APP_CURRENT_STATE.INITIALIZING);
+    await backendProvider.signOut();
+    actions.setAppCurrentState(APP_CURRENT_STATE.SIGN_IN_REQUIRED);
+  };
+
   return (
     <AppStateContext.Provider
       value={{
@@ -69,6 +75,7 @@ export const AppProvider: FC<AppStateProviderProps> = (props) => {
         Resolvers,
         getDataBlockRecord,
         getDataBlock,
+        handleSignOut,
       }}
     >
       {state.currentState === APP_CURRENT_STATE.READY &&

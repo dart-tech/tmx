@@ -46,6 +46,7 @@ interface AppStateContextValue extends AppState {
   backendProvider: BackendProvider;
   Resolvers: ResolversType;
   setAuth: (auth: AppState["auth"]) => void;
+  handleSignOut: () => void;
   setAppCurrentState: (currentState: APP_CURRENT_STATE) => void;
   setDataBlockRecord: (dataBlockId: string, record: DataRecord) => void;
   setDataBlock: (dataBlockId: string, data: DataRecord[]) => void;
@@ -76,6 +77,7 @@ const defaultStateValue: AppState = {
 const defaultContextValue: AppStateContextValue = {
   ...defaultStateValue,
   setAuth: (auth: AppState["auth"]) => {},
+  handleSignOut: () => {},
   setAppCurrentState: (currentState: APP_CURRENT_STATE) => {},
   backendProvider: {} as BackendProvider,
   Resolvers: {},
@@ -283,6 +285,7 @@ abstract class BackendProvider {
     email: string;
     password: string;
   }): Promise<[User | undefined, string | undefined]>;
+  abstract signOut(): Promise<void>;
   abstract getCurrentUser(): Promise<User | undefined>;
   abstract getJWTToken(): Promise<string | undefined>;
   abstract getSingleRecord(entity: Entity, id: string): Promise<DataRecord>;

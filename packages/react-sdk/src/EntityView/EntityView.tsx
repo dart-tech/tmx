@@ -89,8 +89,8 @@ export function EntityView(props: EntityViewProps) {
             >
               <div className="flex flex-col">
                 <h1 className="text-md">{entity.name}</h1>
-                <p className="text-small text-default-500">
-                  {entity?.description}
+                <p className="text-small text-default-500 font-normal truncate w-64">
+                  {entity.description}
                 </p>
               </div>
               <span

@@ -1,28 +1,35 @@
-import { DataRecord, ResolversType } from "../../AppContext.js";
+import { ResolversType } from "../../AppContext.js";
 import { PROPERTY_TYPE, Property } from "../../Property.js";
 
 const Default = () => {
   return <></>;
 };
 
+const PropertyTypeInputMap = (resolvers: ResolversType) => ({
+  [PROPERTY_TYPE.CHECKBOX]: resolvers.CheckboxPropertyInput,
+  [PROPERTY_TYPE.CURRENCY]: resolvers.CurrencyPropertyInput,
+  [PROPERTY_TYPE.DATE]: resolvers.DatePropertyInput,
+  [PROPERTY_TYPE.EMAIL]: resolvers.EmailPropertyInput,
+  [PROPERTY_TYPE.FILES]: resolvers.FilesPropertyInput,
+  [PROPERTY_TYPE.FORMULA]: resolvers.FormulaPropertyInput,
+  [PROPERTY_TYPE.MULTIPLE_SELECT]: resolvers.MultipleSelectPropertyInput,
+  [PROPERTY_TYPE.NUMBER]: resolvers.NumberPropertyInput,
+  [PROPERTY_TYPE.PHONE_NUMBER]: resolvers.PhoneNumberPropertyInput,
+  [PROPERTY_TYPE.RADIO]: resolvers.RadioPropertyInput,
+  [PROPERTY_TYPE.RICH_TEXT]: resolvers.RichTextPropertyInput,
+  [PROPERTY_TYPE.SINGLE_SELECT]: resolvers.SingleSelectPropertyInput,
+  [PROPERTY_TYPE.TEXT]: resolvers.TextPropertyInput,
+  [PROPERTY_TYPE.URL]: resolvers.URLPropertyInput,
+  [PROPERTY_TYPE.SWITCH]: resolvers.SwitchPropertyInput,
+  [PROPERTY_TYPE.RANGE]: resolvers.RangePropertyInput,
+  [PROPERTY_TYPE.RELATION]: resolvers.RelationPropertyInput,
+  [PROPERTY_TYPE.JSON]: () => <></>,
+});
+
 export const getInputForProperty = (
   property: Property,
   resolvers: ResolversType
 ) => {
-  switch (property.type) {
-    case PROPERTY_TYPE.TEXT:
-      return resolvers.TextProperty;
-    case PROPERTY_TYPE.SINGLE_SELECT:
-      return resolvers.SingleSelectProperty;
-    case PROPERTY_TYPE.URL:
-      return resolvers.UrlProperty;
-    case PROPERTY_TYPE.SWITCH:
-      return resolvers.SwitchProperty;
-    case PROPERTY_TYPE.RICH_TEXT:
-      return resolvers.RichTextProperty;
-    case PROPERTY_TYPE.FILES:
-      return resolvers.FilesProperty;
-    default:
-      return Default;
-  }
+  const input = PropertyTypeInputMap(resolvers)[property.type];
+  return input ? input : Default;
 };

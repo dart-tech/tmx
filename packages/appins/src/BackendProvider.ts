@@ -53,6 +53,9 @@ export class AppinsBackendProvider extends BackendProvider {
       undefined,
     ];
   }
+  async signOut(): Promise<void> {
+    await Auth.signOut();
+  }
   async getCurrentUser(): Promise<User | undefined> {
     try {
       const authenticatedUser = await Auth.currentAuthenticatedUser();
