@@ -14,8 +14,6 @@ export default function SignIn() {
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors },
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -51,6 +49,8 @@ export default function SignIn() {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
+        backgroundColor: "#0093E9",
+        backgroundImage: "linear-gradient(160deg, #0093E9 0%, #80D0C7 100%)"
       }}
     >
       <Resolvers.Card
@@ -60,7 +60,7 @@ export default function SignIn() {
       >
         <Resolvers.CardHeader className="flex gap-3">
           <div className="flex flex-col">
-            <p className="text-md">{app?.name}</p>
+            <p className="text-md">Sign In to {app?.name}</p>
             <p className="text-small text-default-500">{
               app?.description
             }</p>
