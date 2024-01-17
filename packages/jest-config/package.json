@@ -1,10 +1,12 @@
 {
   "name": "@tmakex/jest-config",
   "version": "0.0.0",
-  "private": true,
   "files": [
     "index.js"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.6",
     "@testing-library/react": "^14.1.2",

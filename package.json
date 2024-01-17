@@ -1,15 +1,18 @@
 {
   "name": "tmx",
-  "private": true,
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky install",
-    "commit": "cz"
+    "commit": "cz",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "turbo run build --filter='./packages/*' --no-cache --force && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.1",
     "@tmakex/eslint-config": "workspace:*",
     "@tmakex/jest-config": "workspace:*",
     "@tmakex/typescript-config": "workspace:*",

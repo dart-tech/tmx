@@ -1,12 +1,14 @@
 {
   "name": "docs",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
     "dev": "next dev --port 3003",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings 0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "next": "^14.0.3",
