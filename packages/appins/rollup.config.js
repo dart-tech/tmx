@@ -2,9 +2,9 @@ import typescript from "@rollup/plugin-typescript";
 
 const entries = [
   {
-    input: "src/BackendProvider.ts",
+    input: "src/index.ts",
     output: {
-      file: "dist/BackendProvider.js",
+      file: "dist/index.js",
     },
   },
 ];

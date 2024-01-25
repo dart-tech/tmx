@@ -2,12 +2,7 @@
   "name": "@tmakex/appins",
   "version": "0.0.1",
   "type": "module",
-  "exports": {
-    "./BackendProvider": {
-      "types": "./dist/BackendProvider.d.ts",
-      "default": "./dist/BackendProvider.js"
-    }
-  },
+  "main": "dist/index.js",
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "generate:component": "turbo gen react-component",
