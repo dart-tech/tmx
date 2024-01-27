@@ -2,6 +2,7 @@ import { createContext, ReactNode, useContext } from "react";
 import { App } from "./App.js";
 import { Entity } from "./Entity.js";
 import { produce } from "immer";
+import { Property } from "./Property.js";
 
 enum APP_CURRENT_STATE {
   IDLE,
@@ -42,6 +43,22 @@ interface AppState {
   dataBlock: Record<string, DataRecord[]>;
 }
 
+export enum AUTHORIZER_ACTION {
+  DELETE_RECORD = "deleteRecord",
+  CREATE_RECORD = "createRecord",
+  UPDATE_RECORD = "updateRecord",
+  GET_RECORD = "getRecord",
+  GET_RECORDS = "getRecords",
+  MUTATE_RECORD_PROPERTY = "mutateRecordProperty",
+}
+
+type AuthorizerContext = {
+  entity: Entity;
+  user?: User;
+  property?: Property;
+  record?: DataRecord;
+};
+
 interface AppStateContextValue extends AppState {
   backendProvider: BackendProvider;
   Resolvers: ResolversType;
@@ -52,6 +69,11 @@ interface AppStateContextValue extends AppState {
   setDataBlock: (dataBlockId: string, data: DataRecord[]) => void;
   getDataBlock: (dataBlockId: string) => DataRecord[];
   getDataBlockRecord: (dataBlockId: string, recordId: string) => DataRecord;
+  removeDataBlockRecord: (dataBlockId: string, recordId: string) => void;
+  can: (
+    action: AUTHORIZER_ACTION,
+    context: AuthorizerContext
+  ) => [boolean, string | undefined]; // [can, reason]
 }
 
 interface AppStateProviderProps {
@@ -89,6 +111,10 @@ const defaultContextValue: AppStateContextValue = {
   getDataBlock: (dataBlockId: string) => {
     return [] as DataRecord[];
   },
+  removeDataBlockRecord: (dataBlockId: string, recordId: string) => {},
+  can: (action: AUTHORIZER_ACTION, context: AuthorizerContext) => {
+    return [false, undefined];
+  },
 };
 
 enum ActionType {
@@ -97,6 +123,7 @@ enum ActionType {
   SET_AUTH = "SET_AUTH",
   SET_DATA_BLOCK = "SET_DATA_BLOCK",
   SET_DATA_BLOCK_RECORD = "SET_DATA_BLOCK_RECORD",
+  REMOVE_DATA_BLOCK_RECORD = "REMOVE_DATA_BLOCK_RECORD",
 }
 
 type SetApp = {
@@ -136,12 +163,21 @@ type SetDataBlockRecord = {
   };
 };
 
+type RemoveDataBlockRecord = {
+  type: ActionType.REMOVE_DATA_BLOCK_RECORD;
+  payload: {
+    dataBlockId: string;
+    recordId: string;
+  };
+};
+
 type Action =
   | SetApp
   | SetAppCurrentState
   | SetAuth
   | SetDataBlock
-  | SetDataBlockRecord;
+  | SetDataBlockRecord
+  | RemoveDataBlockRecord;
 
 type Handler = (state: AppState, action: Action) => AppState;
 
@@ -192,6 +228,21 @@ const handlers: Record<ActionType, Handler> = {
           ...action.payload.record,
         };
       }
+    });
+    return nextState;
+  },
+  [ActionType.REMOVE_DATA_BLOCK_RECORD]: (state, action) => {
+    const nextState = produce(state, (draftState) => {
+      if (!draftState.dataBlock[action.payload.dataBlockId]) {
+        return;
+      }
+      const recordIndex = draftState.dataBlock[
+        action.payload.dataBlockId
+      ].findIndex((record) => record.id === action.payload.recordId);
+      if (recordIndex === -1) {
+        return;
+      }
+      draftState.dataBlock[action.payload.dataBlockId].splice(recordIndex, 1);
     });
     return nextState;
   },
@@ -248,6 +299,15 @@ const Actions = (dispatch: React.Dispatch<Action>) => ({
       },
     });
   },
+  removeDataBlockRecord: (dataBlockId: string, recordId: string) => {
+    dispatch({
+      type: ActionType.REMOVE_DATA_BLOCK_RECORD,
+      payload: {
+        dataBlockId,
+        recordId,
+      },
+    });
+  },
 });
 
 const useAppState = () => {
@@ -286,6 +346,10 @@ abstract class BackendProvider {
     password: string;
   }): Promise<[User | undefined, string | undefined]>;
   abstract signOut(): Promise<void>;
+  abstract can(
+    action: AUTHORIZER_ACTION,
+    context: AuthorizerContext
+  ): [boolean, string | undefined];
   abstract getCurrentUser(): Promise<User | undefined>;
   abstract getJWTToken(): Promise<string | undefined>;
   abstract getSingleRecord(entity: Entity, id: string): Promise<DataRecord>;
@@ -298,6 +362,10 @@ abstract class BackendProvider {
     entity: Entity,
     record: DataRecord
   ): Promise<[DataRecord | undefined, string | undefined]>;
+  abstract deleteRecord(
+    entity: Entity,
+    record: DataRecord
+  ): Promise<[boolean | undefined, string | undefined]>;
 }
 
 export {
@@ -324,4 +392,5 @@ export type {
   User,
   ResolversType,
   DataRecord,
+  AuthorizerContext,
 };

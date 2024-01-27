@@ -1,8 +1,21 @@
 import { ResolversType } from "../../AppContext.js";
 import { PROPERTY_TYPE, Property } from "../../Property.js";
 
-const Default = () => {
-  return <></>;
+const Default = ({ type }: { type: string }) => {
+  return (
+    <div
+      style={{
+        color: "white",
+        fontWeight: 400,
+        fontSize: "0.8rem",
+        padding: "0.5rem",
+        backgroundColor: "#F87171",
+      }}
+    >
+      {" "}
+      Property <b>{type}</b> input not implemented
+    </div>
+  );
 };
 
 const PropertyTypeInputMap = (resolvers: ResolversType) => ({
@@ -19,7 +32,7 @@ const PropertyTypeInputMap = (resolvers: ResolversType) => ({
   [PROPERTY_TYPE.RICH_TEXT]: resolvers.RichTextPropertyInput,
   [PROPERTY_TYPE.SINGLE_SELECT]: resolvers.SingleSelectPropertyInput,
   [PROPERTY_TYPE.TEXT]: resolvers.TextPropertyInput,
-  [PROPERTY_TYPE.URL]: resolvers.URLPropertyInput,
+  [PROPERTY_TYPE.URL]: resolvers.UrlPropertyInput,
   [PROPERTY_TYPE.SWITCH]: resolvers.SwitchPropertyInput,
   [PROPERTY_TYPE.RANGE]: resolvers.RangePropertyInput,
   [PROPERTY_TYPE.RELATION]: resolvers.RelationPropertyInput,
@@ -31,5 +44,5 @@ export const getInputForProperty = (
   resolvers: ResolversType
 ) => {
   const input = PropertyTypeInputMap(resolvers)[property.type];
-  return input ? input : Default;
+  return input ? input : () => <Default type={property.type} />;
 };

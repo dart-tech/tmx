@@ -5,6 +5,7 @@ import { PROPERTY_TYPE, Property } from "../Property.js";
 import { buildPropsForProperty } from "./helpers/buildProps.js";
 import { getInputForProperty } from "./helpers/getInputForProperty.js";
 import { formValueDiff } from "./helpers/formValueDiff.js";
+import { valuesForRecord } from "../helpers/valuesForRecord.js";
 
 interface EntityFormProps {
   id: string;
@@ -48,12 +49,18 @@ export const EntityForm = ({
           record.id
         );
         setDataBlockRecord(id, dataRecord);
-        reset(dataRecord);
+        const values = valuesForRecord(entity, dataRecord);
+        reset(values);
         setBusy(false);
       };
       getDataRecord();
     }
   }, [entity, record?.id]);
+
+  useEffect(() => {
+    reset(undefined);
+  }, [record?.id]);
+
   const currentRecord = record?.id ? getDataBlockRecord(id, record?.id) : null;
   const properties = useMemo(() => {
     return entity.properties
@@ -66,7 +73,8 @@ export const EntityForm = ({
           inputProps: buildPropsForProperty(
             entity,
             property,
-            currentRecord as DataRecord
+            currentRecord as DataRecord,
+            app!
           ),
         };
       });

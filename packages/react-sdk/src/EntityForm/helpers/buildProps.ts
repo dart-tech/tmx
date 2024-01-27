@@ -1,4 +1,4 @@
-import { DataRecord } from "../../AppContext.js";
+import { App, DataRecord } from "../../AppContext.js";
 import { Entity } from "../../Entity.js";
 import { PROPERTY_TYPE, Property } from "../../Property.js";
 
@@ -15,8 +15,13 @@ type SelectInputProps = {
   options: { id: string; name: string }[];
 };
 
-type RelationInputProps = {
+export type RelationInputProps = {
   defaultValue: string[];
+  target: Entity;
+  relation: {
+    entity: string;
+    type: "has_one" | "has_many";
+  };
 };
 
 type CheckboxInputProps = CommonInputProps & {
@@ -33,7 +38,8 @@ type FilesInputProps = CommonInputProps & {
 };
 
 export type PropertyInputProps =
-  | (CommonInputProps & SelectInputProps)
+  | CommonInputProps
+  | SelectInputProps
   | RelationInputProps
   | CheckboxInputProps
   | TextInputProps
@@ -67,75 +73,131 @@ function DefaultSelectedValuesForInputsWithOptions(
   };
 }
 
-function DefaultSelectedValuesForRelation(
-  _: Entity,
-  property: Property
-): RelationInputProps {
-  let defaultValue: string[] = [];
-  return {
-    defaultValue,
-  };
-}
+// function DefaultSelectedValuesForRelation(
+//   _: Entity,
+//   property: Property
+// ): RelationInputProps {
+//   let defaultValue: string[] = [];
+//   return {
+//     defaultValue,
+//   };
+// }
 
-function Checkbox(entity: Entity, property: Property): CheckboxInputProps {
+function Checkbox(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): CheckboxInputProps {
   return {
     ...Common(entity, property),
     options: [],
   };
 }
 
-function Currency(entity: Entity, property: Property) {
+function Currency(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+) {
   return Common(entity, property);
 }
 
-function Date(entity: Entity, property: Property) {
+function Date(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+) {
   return Common(entity, property);
 }
 
-function Email(entity: Entity, property: Property) {
+function Email(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+) {
   return Common(entity, property);
 }
 
-function Files(entity: Entity, property: Property): FilesInputProps {
+function Files(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): FilesInputProps {
   return {
     file_path_prefix: `entity/${entity.id}`,
     ...Common(entity, property),
   };
 }
 
-function Formula(entity: Entity, property: Property) {
+function Formula(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+) {
   return Common(entity, property);
 }
 
-function MultipleSelect(entity: Entity, property: Property) {
+function MultipleSelect(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+) {
   return {
     ...Common(entity, property),
   };
 }
 
-function Number(entity: Entity, property: Property) {
+function Number(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+) {
   return Common(entity, property);
 }
 
-function PhoneNumber(entity: Entity, property: Property) {
+function PhoneNumber(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+) {
   return Common(entity, property);
 }
 
-function Radio(entity: Entity, property: Property): CheckboxInputProps {
+function Radio(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): CheckboxInputProps {
   return {
     ...Common(entity, property),
     options: [],
   };
 }
 
-function RichText(entity: Entity, property: Property): CommonInputProps {
+function RichText(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): CommonInputProps {
   return Common(entity, property);
 }
 
 function SingleSelect(
   entity: Entity,
   property: Property,
-  record: DataRecord
+  record: DataRecord,
+  app: App
 ): SelectInputProps {
   return {
     ...Common(entity, property),
@@ -144,7 +206,12 @@ function SingleSelect(
   };
 }
 
-function Text(entity: Entity, property: Property): TextInputProps {
+function Text(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): TextInputProps {
   return {
     ...Common(entity, property),
     use_textarea: property?.config?.use_textarea,
@@ -152,26 +219,64 @@ function Text(entity: Entity, property: Property): TextInputProps {
   };
 }
 
-function URL(entity: Entity, property: Property): CommonInputProps {
+function URL(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): CommonInputProps {
   return Common(entity, property);
 }
 
-function Switch(entity: Entity, property: Property): CommonInputProps {
+function Switch(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): CommonInputProps {
   return Common(entity, property);
 }
 
-function Range(entity: Entity, property: Property): CommonInputProps {
+function Range(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): CommonInputProps {
   return Common(entity, property);
 }
 
-function JSON(entity: Entity, property: Property): CommonInputProps {
+function JSON(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): CommonInputProps {
   return Common(entity, property);
 }
 
-function Relation(entity: Entity, property: Property): RelationInputProps {
+function Relation(
+  entity: Entity,
+  property: Property,
+  record: DataRecord,
+  app: App
+): RelationInputProps {
+  const relation = property.config?.relation;
+  const targetEntity = app.entities[relation?.entity!];
+  let defaultValue = [];
+  if (record) {
+    const toMap = relation?.type === "has_one" ? [record] : record[property.id];
+    defaultValue = toMap
+      ?.map((item: DataRecord) => item.id || item)
+      .flat()
+      .filter((withVal: string) => withVal);
+  }
+
   return {
     ...Common(entity, property),
-    defaultValue: [],
+    target: targetEntity,
+    defaultValue,
+    relation,
   };
 }
 
@@ -183,7 +288,8 @@ export type InputProps = Property & {
 export function buildPropsForProperty(
   entity: Entity,
   property: Property,
-  record: DataRecord
+  record: DataRecord,
+  app: App
 ): PropertyInputProps {
   const PropertyTypePropsBuilder = {
     [PROPERTY_TYPE.CHECKBOX]: Checkbox,
@@ -209,5 +315,5 @@ export function buildPropsForProperty(
   if (!builder) {
     throw new Error(`Property type ${property.type} is not supported yet.`);
   }
-  return builder(entity, property, record);
+  return builder(entity, property, record, app);
 }

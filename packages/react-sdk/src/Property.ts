@@ -35,5 +35,9 @@ export interface Property {
       id: string;
       name: string;
     }[];
+    relation?: {
+      entity: string;
+      type: "has_one" | "has_many";
+    };
   };
 }

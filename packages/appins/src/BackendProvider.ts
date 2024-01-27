@@ -6,15 +6,52 @@ import {
   User,
   DataRecord,
   Entity,
+  AUTHORIZER_ACTION,
+  AuthorizerContext,
 } from "@tmakex/react-sdk";
 import { getApiEndpoint } from "./getApiEndpoint.js";
 import { Auth } from "./amplifyConfig.js";
 import { mapApp } from "./mapApp.js";
+import { MatchConditions, PureAbility } from "@casl/ability";
+
+interface AppinsGrant {
+  id: string;
+  action: string;
+  attributes: string;
+  resource: string;
+  subject: string;
+}
+interface AppinsRole {
+  id: string;
+  name: string;
+  grants: AppinsGrant[];
+}
+
+interface AppinsAccessControl {
+  roles: AppinsRole[];
+  userGrants: AppinsGrant[];
+  ability?: PureAbility;
+}
+const customMatcher = (matchConditions: MatchConditions) => () => {
+  return false;
+};
+
+const buildAbility = (accessControl: AppinsAccessControl) => {
+  return new PureAbility(accessControl.userGrants, {
+    conditionsMatcher: customMatcher,
+  });
+};
 
 export class AppinsBackendProvider extends BackendProvider {
+  AccessControl: AppinsAccessControl;
+
   constructor(appId: string) {
     const APPINS_API_ENDPOINT = getApiEndpoint();
     super(APPINS_API_ENDPOINT, appId);
+    this.AccessControl = {
+      roles: [],
+      userGrants: [],
+    };
   }
   async loadApp(): Promise<[App | undefined, AppLoadError | undefined]> {
     const token = await this.getJWTToken();
@@ -34,6 +71,17 @@ export class AppinsBackendProvider extends BackendProvider {
         },
       ];
     }
+    const userGrants = result.user.grants;
+    const roles = result.app.roles;
+    const _AccessControl = {
+      roles,
+      userGrants,
+    };
+    const ability = buildAbility(_AccessControl);
+    this.AccessControl = {
+      ..._AccessControl,
+      ability,
+    };
     return [appMapped, undefined];
   }
   async signIn({
@@ -77,6 +125,13 @@ export class AppinsBackendProvider extends BackendProvider {
     } catch (error) {
       return undefined;
     }
+  }
+  can(
+    action: AUTHORIZER_ACTION,
+    context: AuthorizerContext
+  ): [boolean, string | undefined] {
+    const _can = this.AccessControl.ability?.can(action, context);
+    return [!!_can, undefined];
   }
   async getSingleRecord(entity: Entity, id: string): Promise<DataRecord> {
     const token = await this.getJWTToken();
@@ -148,5 +203,23 @@ export class AppinsBackendProvider extends BackendProvider {
     const receivedRecord = response.record;
     receivedRecord.id = receivedRecord.id.toString();
     return [receivedRecord, undefined];
+  }
+  async deleteRecord(
+    entity: Entity,
+    record: DataRecord
+  ): Promise<[boolean | undefined, string | undefined]> {
+    const token = await this.getJWTToken();
+    const response = await fetch(
+      `${this.apiEndpoint}/lambda-server/${this.appId}/${entity.id}/${record.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: token || "",
+        },
+      }
+    ).then((res) => res.json());
+    return [response.success, undefined];
   }
 }

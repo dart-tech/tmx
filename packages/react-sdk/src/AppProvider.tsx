@@ -7,6 +7,8 @@ import {
   Actions,
   APP_CURRENT_STATE,
   DataRecord,
+  AUTHORIZER_ACTION,
+  AuthorizerContext,
 } from "./AppContext.js";
 import SignIn from "./SignIn.js";
 
@@ -66,6 +68,13 @@ export const AppProvider: FC<AppStateProviderProps> = (props) => {
     actions.setAppCurrentState(APP_CURRENT_STATE.SIGN_IN_REQUIRED);
   };
 
+  const can = (action: AUTHORIZER_ACTION, context: AuthorizerContext) => {
+    return backendProvider.can(action, {
+      ...context,
+      user: state?.auth?.user!,
+    });
+  };
+
   return (
     <AppStateContext.Provider
       value={{
@@ -76,6 +85,7 @@ export const AppProvider: FC<AppStateProviderProps> = (props) => {
         getDataBlockRecord,
         getDataBlock,
         handleSignOut,
+        can,
       }}
     >
       {state.currentState === APP_CURRENT_STATE.READY &&

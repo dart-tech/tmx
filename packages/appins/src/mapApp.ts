@@ -75,6 +75,10 @@ export interface Config {
     id: string;
     name: string;
   }[];
+  relation: {
+    entity: string;
+    type: "has_one" | "has_many";
+  };
 }
 
 export interface Option {
@@ -140,7 +144,7 @@ export function mapApp(appConfig: Root): App {
                 ? mapProperty(entity.identity_property)
                 : undefined,
               properties: entity.properties.map((property) =>
-                mapProperty(property)
+                mapProperty(property, app.entities)
               ),
             };
             return accumulator;
@@ -151,7 +155,10 @@ export function mapApp(appConfig: Root): App {
   };
 }
 
-function mapProperty(property: AppinsProperty): Property {
+function mapProperty(
+  property: AppinsProperty,
+  entities?: Record<string, AppinsEntity>
+): Property {
   return {
     id: property.column_name,
     name: property.name,
@@ -162,6 +169,10 @@ function mapProperty(property: AppinsProperty): Property {
       use_textarea: property.config?.use_textarea,
       default_value: property.config?.default_value,
       options: property.config?.options,
+      relation: {
+        entity: entities?.[property.config?.relation?.entity!]?.table_name!,
+        type: property.config?.relation?.type!,
+      },
     },
   };
 }

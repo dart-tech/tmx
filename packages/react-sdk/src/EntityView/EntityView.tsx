@@ -3,6 +3,11 @@ import { DataRecord, useAppState } from "../AppContext.js";
 import { EntityForm } from "../index.js";
 import { RecordFormatter } from "../Formatter/RecordFormatter.js";
 import { PlusIcon } from "../Icons/PlusIcon.js";
+import { valuesForRecord } from "../helpers/valuesForRecord.js";
+import {
+  EntityRecordActions,
+  RECORD_ACTION_TYPE,
+} from "../EntityRecordActions/index.js";
 
 interface EntityViewProps {
   id: string;
@@ -36,7 +41,6 @@ export function EntityView(props: EntityViewProps) {
         setDataBlock(entityId, list);
         setActiveRecord(list[0]?.id || null);
       } catch (e) {
-        console.error(e);
       } finally {
         setBusy(false);
       }
@@ -110,7 +114,10 @@ export function EntityView(props: EntityViewProps) {
                     {} as DataRecord
                   );
                   if (record) {
-                    setDataBlockRecord(entityId, record);
+                    setDataBlockRecord(
+                      entityId,
+                      valuesForRecord(entity, record)!
+                    );
                     setActiveRecord(record.id);
                   }
                 }}
@@ -166,6 +173,21 @@ export function EntityView(props: EntityViewProps) {
                   padding: "1rem",
                 }}
               >
+                <EntityRecordActions
+                  entity={entity}
+                  record={{
+                    id: activeRecord,
+                  }}
+                  onActionComplete={({
+                    action,
+                  }: {
+                    action: RECORD_ACTION_TYPE;
+                  }) => {
+                    if (action === RECORD_ACTION_TYPE.DELETE_RECORD) {
+                      setActiveRecord(null);
+                    }
+                  }}
+                />
                 <EntityForm
                   id={entityId}
                   record={{
