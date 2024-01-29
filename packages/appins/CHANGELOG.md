@@ -1,5 +1,14 @@
 # @tmakex/appins
 
+## 0.0.3
+
+### Patch Changes
+
+- [`c13cfa9`](https://github.com/dart-tech/tmx/commit/c13cfa941b85c55eea8b974d223f0851e2187548) Thanks [@ismajl-ramadani](https://github.com/ismajl-ramadani)! - Support for more resolvers; bug fixes; ability to customize underlying components through overrides
+
+- Updated dependencies [[`c13cfa9`](https://github.com/dart-tech/tmx/commit/c13cfa941b85c55eea8b974d223f0851e2187548)]:
+  - @tmakex/react-sdk@0.0.2
+
 ## 0.0.2
 
 ### Patch Changes
