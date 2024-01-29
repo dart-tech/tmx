@@ -10,9 +10,19 @@ export enum RECORD_ACTION_TYPE {
   "CUSTOM_ACTION" = "customAction",
 }
 
+export interface EntityRecordCustomAction {
+  id: string;
+  label: string;
+  description?: string;
+  shortcut?: string;
+  color?: string;
+  onClick: (record: DataRecord) => void;
+}
+
 export function EntityRecordActions(props: {
   entity: Entity;
   record: DataRecord;
+  customActions?: EntityRecordCustomAction[];
   onActionComplete: ({ action }: { action: RECORD_ACTION_TYPE }) => void;
 }) {
   const { Resolvers, can } = useAppState();
@@ -46,6 +56,19 @@ export function EntityRecordActions(props: {
             ...[canDeleteRecord ? "" : RECORD_ACTION_TYPE.DELETE_RECORD],
           ]}
         >
+          {props.customActions?.map((action) => (
+            <Resolvers.DropdownItem
+              key={action.id}
+              shortcut={action.shortcut}
+              description={action.description}
+              color={action.color}
+              onClick={() => {
+                action.onClick(props.record);
+              }}
+            >
+              {action.label}
+            </Resolvers.DropdownItem>
+          )) ?? []}
           <Resolvers.DropdownItem
             key={RECORD_ACTION_TYPE.NEW_RECORD}
             shortcut="⌘N"

@@ -6,6 +6,7 @@ import { buildPropsForProperty } from "./helpers/buildProps.js";
 import { getInputForProperty } from "./helpers/getInputForProperty.js";
 import { formValueDiff } from "./helpers/formValueDiff.js";
 import { valuesForRecord } from "../helpers/valuesForRecord.js";
+import { Entity } from "../Entity.js";
 
 interface EntityFormProps {
   id: string;
@@ -14,13 +15,19 @@ interface EntityFormProps {
   };
   dataTestId?: string;
   omitWrapper?: boolean;
+  overrides?: EntityFormOverrides;
 }
 
+export interface EntityFormOverrides {
+  properties?: Record<string, Property>;
+  entity?: Entity;
+}
 export const EntityForm = ({
   id,
   record,
   dataTestId,
   omitWrapper,
+  overrides,
 }: EntityFormProps) => {
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +70,7 @@ export const EntityForm = ({
 
   const currentRecord = record?.id ? getDataBlockRecord(id, record?.id) : null;
   const properties = useMemo(() => {
-    return entity.properties
+    return entity?.properties
       ?.filter(
         (property: Property) => property.type !== PROPERTY_TYPE.AUTO_INCREMENT
       )
@@ -74,7 +81,8 @@ export const EntityForm = ({
             entity,
             property,
             currentRecord as DataRecord,
-            app!
+            app!,
+            overrides!
           ),
         };
       });

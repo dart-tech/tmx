@@ -31,6 +31,7 @@ export interface Property {
     help_text?: string;
     use_textarea?: boolean;
     default_value?: string;
+    disabled?: boolean;
     options?: {
       id: string;
       name: string;

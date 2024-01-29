@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
 import { DataRecord, useAppState } from "../AppContext.js";
-import { EntityForm } from "../index.js";
+import { EntityForm, EntityFormOverrides } from "../index.js";
 import { RecordFormatter } from "../Formatter/RecordFormatter.js";
 import { PlusIcon } from "../Icons/PlusIcon.js";
 import { valuesForRecord } from "../helpers/valuesForRecord.js";
 import {
   EntityRecordActions,
+  EntityRecordCustomAction,
   RECORD_ACTION_TYPE,
 } from "../EntityRecordActions/index.js";
 
+export interface EntityViewOverrides {
+  entityForm?: EntityFormOverrides;
+}
 interface EntityViewProps {
   id: string;
   dataTestId?: string;
+  customActions?: EntityRecordCustomAction[];
+  overrides?: EntityViewOverrides;
 }
 
 export function EntityView(props: EntityViewProps) {
@@ -22,6 +28,7 @@ export function EntityView(props: EntityViewProps) {
     setDataBlock,
     setDataBlockRecord,
     getDataBlock,
+    getDataBlockRecord,
   } = useAppState();
   const entityId = props.id;
   const entity = app?.entities[entityId];
@@ -174,10 +181,9 @@ export function EntityView(props: EntityViewProps) {
                 }}
               >
                 <EntityRecordActions
-                  entity={entity}
-                  record={{
-                    id: activeRecord,
-                  }}
+                  entity={entity!}
+                  record={getDataBlockRecord(entityId, activeRecord)}
+                  customActions={props.customActions}
                   onActionComplete={({
                     action,
                   }: {
@@ -194,6 +200,7 @@ export function EntityView(props: EntityViewProps) {
                     id: activeRecord,
                   }}
                   omitWrapper
+                  overrides={props.overrides?.entityForm}
                 />
               </div>
             )}

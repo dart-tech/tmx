@@ -42,15 +42,25 @@ const buildAbility = (accessControl: AppinsAccessControl) => {
   });
 };
 
+interface AppinsCustomMetadata {
+  app_id: string;
+  organization_id: string;
+}
+
 export class AppinsBackendProvider extends BackendProvider {
-  AccessControl: AppinsAccessControl;
+  accessControl: AppinsAccessControl;
+  customMetadata: AppinsCustomMetadata;
 
   constructor(appId: string) {
     const APPINS_API_ENDPOINT = getApiEndpoint();
     super(APPINS_API_ENDPOINT, appId);
-    this.AccessControl = {
+    this.accessControl = {
       roles: [],
       userGrants: [],
+    };
+    this.customMetadata = {
+      app_id: appId,
+      organization_id: "",
     };
   }
   async loadApp(): Promise<[App | undefined, AppLoadError | undefined]> {
@@ -73,14 +83,18 @@ export class AppinsBackendProvider extends BackendProvider {
     }
     const userGrants = result.user.grants;
     const roles = result.app.roles;
-    const _AccessControl = {
+    const _accessControl = {
       roles,
       userGrants,
     };
-    const ability = buildAbility(_AccessControl);
-    this.AccessControl = {
-      ..._AccessControl,
+    const ability = buildAbility(_accessControl);
+    this.accessControl = {
+      ..._accessControl,
       ability,
+    };
+    this.customMetadata = {
+      app_id: result.app.id,
+      organization_id: result.app.organization_id,
     };
     return [appMapped, undefined];
   }
@@ -94,7 +108,7 @@ export class AppinsBackendProvider extends BackendProvider {
     const result = await Auth.signIn(email, password);
     return [
       {
-        id: result.username,
+        id: result.attributes.sub,
         email: result.attributes.email,
         name: result.attributes.name,
       },
@@ -108,7 +122,7 @@ export class AppinsBackendProvider extends BackendProvider {
     try {
       const authenticatedUser = await Auth.currentAuthenticatedUser();
       return {
-        id: authenticatedUser.username,
+        id: authenticatedUser.attributes.sub,
         email: authenticatedUser.attributes.email,
         name: authenticatedUser.attributes.name,
       };
@@ -130,7 +144,7 @@ export class AppinsBackendProvider extends BackendProvider {
     action: AUTHORIZER_ACTION,
     context: AuthorizerContext
   ): [boolean, string | undefined] {
-    const _can = this.AccessControl.ability?.can(action, context);
+    const _can = this.accessControl.ability?.can(action, context);
     return [!!_can, undefined];
   }
   async getSingleRecord(entity: Entity, id: string): Promise<DataRecord> {
@@ -221,5 +235,44 @@ export class AppinsBackendProvider extends BackendProvider {
       }
     ).then((res) => res.json());
     return [response.success, undefined];
+  }
+  async uploadFile(
+    file: File,
+    fileKey: string,
+    onProgress?: ((progress: number) => void) | undefined,
+    abortSignal?: AbortSignal | undefined
+  ): Promise<[string | undefined, string | undefined]> {
+    const token = await this.getJWTToken();
+    const response = await fetch(
+      `${this.apiEndpoint}/lambda-server/${this.appId}/do`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: token || "",
+        },
+        body: JSON.stringify({
+          op: "_getSignedUrl",
+          app_id: this.customMetadata.app_id,
+          organization_id: this.customMetadata.organization_id,
+          contentType: file.type,
+          fileKey,
+        }),
+      }
+    ).then((res) => res.json());
+    const { signedUrl, fileKey: fileKeyResponse } = response;
+    const uploadResponse = await fetch(signedUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type,
+      },
+      body: file,
+      signal: abortSignal,
+    });
+    if (!uploadResponse.ok) {
+      throw new Error("Upload failed");
+    }
+    return [fileKeyResponse, undefined];
   }
 }

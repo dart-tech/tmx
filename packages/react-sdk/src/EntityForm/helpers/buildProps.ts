@@ -1,6 +1,7 @@
 import { App, DataRecord } from "../../AppContext.js";
 import { Entity } from "../../Entity.js";
 import { PROPERTY_TYPE, Property } from "../../Property.js";
+import { EntityFormOverrides } from "../EntityForm.js";
 
 type CommonInputProps = {
   name: string;
@@ -8,6 +9,9 @@ type CommonInputProps = {
   label: string;
   required?: boolean;
   help_text?: string;
+  entity?: Entity;
+  property?: Property;
+  disabled?: boolean;
 };
 
 type SelectInputProps = {
@@ -45,13 +49,20 @@ export type PropertyInputProps =
   | TextInputProps
   | FilesInputProps;
 
-function Common(entity: Entity, property: Property): CommonInputProps {
+function Common(
+  entity: Entity,
+  property: Property,
+  overrides?: EntityFormOverrides
+): CommonInputProps {
   return {
     name: property.id,
     placeholder: `Type ${entity.name} ${property.name}`,
     label: property.name,
     required: property?.config?.required,
     help_text: property?.config?.help_text,
+    entity,
+    property,
+    disabled: overrides?.properties?.[property.id]?.config?.disabled,
   };
 }
 
@@ -73,21 +84,12 @@ function DefaultSelectedValuesForInputsWithOptions(
   };
 }
 
-// function DefaultSelectedValuesForRelation(
-//   _: Entity,
-//   property: Property
-// ): RelationInputProps {
-//   let defaultValue: string[] = [];
-//   return {
-//     defaultValue,
-//   };
-// }
-
 function Checkbox(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): CheckboxInputProps {
   return {
     ...Common(entity, property),
@@ -99,7 +101,8 @@ function Currency(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ) {
   return Common(entity, property);
 }
@@ -108,7 +111,8 @@ function Date(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ) {
   return Common(entity, property);
 }
@@ -117,16 +121,18 @@ function Email(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ) {
-  return Common(entity, property);
+  return Common(entity, property, overrides);
 }
 
 function Files(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): FilesInputProps {
   return {
     file_path_prefix: `entity/${entity.id}`,
@@ -138,7 +144,8 @@ function Formula(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ) {
   return Common(entity, property);
 }
@@ -147,7 +154,8 @@ function MultipleSelect(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ) {
   return {
     ...Common(entity, property),
@@ -158,7 +166,8 @@ function Number(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ) {
   return Common(entity, property);
 }
@@ -167,7 +176,8 @@ function PhoneNumber(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ) {
   return Common(entity, property);
 }
@@ -176,7 +186,8 @@ function Radio(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): CheckboxInputProps {
   return {
     ...Common(entity, property),
@@ -188,7 +199,8 @@ function RichText(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): CommonInputProps {
   return Common(entity, property);
 }
@@ -197,7 +209,8 @@ function SingleSelect(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): SelectInputProps {
   return {
     ...Common(entity, property),
@@ -210,7 +223,8 @@ function Text(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): TextInputProps {
   return {
     ...Common(entity, property),
@@ -223,7 +237,8 @@ function URL(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): CommonInputProps {
   return Common(entity, property);
 }
@@ -232,7 +247,8 @@ function Switch(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): CommonInputProps {
   return Common(entity, property);
 }
@@ -241,7 +257,8 @@ function Range(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): CommonInputProps {
   return Common(entity, property);
 }
@@ -250,7 +267,8 @@ function JSON(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): CommonInputProps {
   return Common(entity, property);
 }
@@ -259,7 +277,8 @@ function Relation(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): RelationInputProps {
   const relation = property.config?.relation;
   const targetEntity = app.entities[relation?.entity!];
@@ -289,7 +308,8 @@ export function buildPropsForProperty(
   entity: Entity,
   property: Property,
   record: DataRecord,
-  app: App
+  app: App,
+  overrides: EntityFormOverrides
 ): PropertyInputProps {
   const PropertyTypePropsBuilder = {
     [PROPERTY_TYPE.CHECKBOX]: Checkbox,
@@ -315,5 +335,5 @@ export function buildPropsForProperty(
   if (!builder) {
     throw new Error(`Property type ${property.type} is not supported yet.`);
   }
-  return builder(entity, property, record, app);
+  return builder(entity, property, record, app, overrides);
 }

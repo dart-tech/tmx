@@ -9,6 +9,7 @@ enum APP_CURRENT_STATE {
   INITIALIZING,
   READY,
   ERROR,
+  STALE,
   SIGN_IN_REQUIRED,
 }
 
@@ -366,6 +367,12 @@ abstract class BackendProvider {
     entity: Entity,
     record: DataRecord
   ): Promise<[boolean | undefined, string | undefined]>;
+  abstract uploadFile(
+    file: File,
+    fileKey: string,
+    onProgress?: (progress: number) => void,
+    abortSignal?: AbortSignal
+  ): Promise<[string | undefined, string | undefined]>;
 }
 
 export {

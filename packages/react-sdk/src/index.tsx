@@ -5,3 +5,4 @@ export * from "./Entity.js";
 export * from "./Property.js";
 export * from "./EntityView/index.js";
 export * from "./Formatter/RecordFormatter.js";
+export type { EntityRecordCustomAction } from "./EntityRecordActions/index.js";

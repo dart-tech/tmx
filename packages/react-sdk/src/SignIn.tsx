@@ -27,7 +27,7 @@ export default function SignIn() {
           errorInitializing: "",
           busyInitializing: false,
         });
-        setAppCurrentState(APP_CURRENT_STATE.READY);
+        setAppCurrentState(APP_CURRENT_STATE.STALE);
       }
     } catch (error) {
       let message = "An error occurred.";

@@ -21,6 +21,8 @@ export const AppProvider: FC<AppStateProviderProps> = (props) => {
   useEffect(() => {
     const performAppLoad = async () => {
       try {
+        actions.setAppCurrentState(APP_CURRENT_STATE.INITIALIZING);
+
         const user = await backendProvider.getCurrentUser();
         if (user) {
           actions.setAuth({
@@ -31,7 +33,6 @@ export const AppProvider: FC<AppStateProviderProps> = (props) => {
             busyInitializing: false,
           });
         }
-        actions.setAppCurrentState(APP_CURRENT_STATE.INITIALIZING);
         const [app, appLoadError] = await backendProvider.loadApp();
         if (app) {
           actions.setApp(app);
@@ -46,8 +47,13 @@ export const AppProvider: FC<AppStateProviderProps> = (props) => {
         actions.setAppCurrentState(APP_CURRENT_STATE.ERROR);
       }
     };
-    performAppLoad();
-  }, []);
+    if (
+      state.currentState === APP_CURRENT_STATE.IDLE ||
+      state.currentState === APP_CURRENT_STATE.STALE
+    ) {
+      performAppLoad();
+    }
+  }, [state.currentState]);
 
   const getDataBlockRecord = (
     dataBlockId: string,
