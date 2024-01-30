@@ -179,7 +179,8 @@ export class AppinsBackendProvider extends BackendProvider {
         body: JSON.stringify(rest),
       }
     ).then((res) => res.json());
-    return [result.record, undefined];
+    const error = result.longMessage;
+    return [result.record, error];
   }
   async getRecords(entity: Entity): Promise<DataRecord[]> {
     const token = await this.getJWTToken();

@@ -95,13 +95,16 @@ export const EntityForm = ({
         const currentRecord = getDataBlockRecord(id, record?.id);
 
         const toSave = formValueDiff({
-          defaultValues: currentRecord,
+          defaultValues: valuesForRecord(entity!, currentRecord),
           values: data,
         });
         const [savedRecord, error] = await backendProvider.saveRecord(entity, {
           id: data.id,
           ...toSave,
         });
+        if (error) {
+          setError(error);
+        }
         if (savedRecord) {
           setDataBlockRecord(id, {
             id: savedRecord.id,
@@ -157,6 +160,7 @@ export const EntityForm = ({
                 <Resolvers.Skeleton isLoaded={!busy} className="rounded-lg">
                   <Input
                     key={property.id}
+                    recordId={record?.id}
                     inputProps={property.inputProps}
                     control={control}
                   />
@@ -165,14 +169,14 @@ export const EntityForm = ({
             );
           })}
           {error && (
-            <div
+            <Resolvers.Card
               style={{
                 marginBottom: "1rem",
               }}
               className="text-red-500"
             >
-              {error}
-            </div>
+              <Resolvers.CardBody>{error}</Resolvers.CardBody>
+            </Resolvers.Card>
           )}
           <div>
             <Resolvers.Button
