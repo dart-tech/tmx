@@ -1,5 +1,13 @@
 # @tmakex/react-sdk
 
+## 0.0.3
+
+### Patch Changes
+
+- [`32671b4`](https://github.com/dart-tech/tmx/commit/32671b45d26953ef8357560e419c4726cb2f0585) Thanks [@ismajl-ramadani](https://github.com/ismajl-ramadani)! - EntityForm improvements
+
+- [`7724ce9`](https://github.com/dart-tech/tmx/commit/7724ce9cd05f282fa924c7dd6ad60e13b6370263) Thanks [@ismajl-ramadani](https://github.com/ismajl-ramadani)! - error handling; enhancement
+
 ## 0.0.2
 
 ### Patch Changes
