@@ -220,7 +220,7 @@ const handlers: Record<ActionType, Handler> = {
         action.payload.dataBlockId
       ].findIndex((record) => record.id === action.payload.record.id);
       if (recordIndex === -1) {
-        draftState.dataBlock[action.payload.dataBlockId].push(
+        draftState.dataBlock[action.payload.dataBlockId].unshift(
           action.payload.record
         );
       } else {

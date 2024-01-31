@@ -227,7 +227,7 @@ function Text(
   overrides: EntityFormOverrides
 ): TextInputProps {
   return {
-    ...Common(entity, property),
+    ...Common(entity, property, overrides),
     use_textarea: property?.config?.use_textarea,
     default_value: property?.config?.default_value,
   };

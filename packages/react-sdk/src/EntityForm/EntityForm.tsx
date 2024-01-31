@@ -41,7 +41,7 @@ export const EntityForm = ({
   } = useAppState();
   const entity = app?.entities[id];
 
-  const { control, handleSubmit, reset } = useForm({
+  const { control, handleSubmit, reset, ...formProps } = useForm({
     defaultValues: {},
   });
 
@@ -77,13 +77,16 @@ export const EntityForm = ({
       .map((property: Property) => {
         return {
           ...property,
-          inputProps: buildPropsForProperty(
-            entity,
-            property,
-            currentRecord as DataRecord,
-            app!,
-            overrides!
-          ),
+          inputProps: {
+            ...buildPropsForProperty(
+              entity,
+              property,
+              currentRecord as DataRecord,
+              app!,
+              overrides!
+            ),
+            formProps,
+          },
         };
       });
   }, [entity, currentRecord]);
